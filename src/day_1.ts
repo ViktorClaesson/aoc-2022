@@ -1,8 +1,8 @@
-import fs from "fs";
+import * as fs from "fs";
 
 // read input
 
-const data = fs
+const data: number[] = fs
   .readFileSync("inputs/day1.txt", "utf8")
   .split("\n\n")
   .map((lines) =>
@@ -14,14 +14,14 @@ const data = fs
 
 // part 1
 
-const answer_1 = data.reduce((a, b) => (a > b ? a : b));
+const answer_1: number = data.reduce((a, b) => (a > b ? a : b));
 console.log(answer_1);
 
 // part 2
 
-const answer_2 = data
+const answer_2: number = data
   .reduce(
-    (acc, b) =>
+    (acc: number[], b: number) =>
       acc
         .concat(b)
         .sort((a, b) => b - a)
