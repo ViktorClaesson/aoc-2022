@@ -2,7 +2,7 @@ import * as fs from "fs";
 
 // read input
 
-const data: string[] = fs.readFileSync("inputs/day_X.txt", "utf8");
+const data: string = fs.readFileSync("inputs/day_X.txt", "utf8");
 
 // part 1
 
