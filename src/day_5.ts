@@ -1,6 +1,7 @@
+import { reverse } from "dns";
 import * as fs from "fs";
 
-// define structures
+// data structures
 
 class Instruction {
   amount: number;
@@ -23,16 +24,17 @@ class Stack {
     this.boxes = boxes;
   }
 
-  move(n: number, other: Stack) {
-    other.#give(this.#take(n));
+  move(n: number, other: Stack, reverse: boolean) {
+    other.#give(this.#take(n, reverse));
   }
 
-  #take(n: number): string[] {
+  #take(n: number, reverse: boolean): string[] {
     const break_point: number = Math.max(this.boxes.length - n, 0);
 
     const to_take: string[] = this.boxes.slice(break_point, this.boxes.length);
     this.boxes = this.boxes.slice(0, break_point);
-    return to_take.reverse();
+
+    return reverse ? to_take.reverse() : to_take;
   }
 
   #give(boxes: string[]) {
@@ -40,49 +42,59 @@ class Stack {
   }
 }
 
-// read input
+// methods
+
+function init_stacks(init_stacks_data: string[]): Stack[] {
+  const init_stacks_indexes = init_stacks_data[0]
+    .split("")
+    .map((val, idx) => (val !== " " ? idx : 0))
+    .filter((val) => val !== 0);
+
+  return init_stacks_indexes.map(
+    (idx) =>
+      new Stack(
+        idx,
+        init_stacks_data
+          .slice(1)
+          .map((line) => line.charAt(idx))
+          .filter((val) => val !== " ")
+      )
+  );
+}
+
+function answer(
+  stacks_data: string[],
+  instructions: Instruction[],
+  reverse: boolean
+): string {
+  const stacks: Stack[] = init_stacks(stacks_data);
+
+  instructions.forEach((instruction) =>
+    stacks[instruction.from - 1].move(
+      instruction.amount,
+      stacks[instruction.to - 1],
+      reverse
+    )
+  );
+
+  const answer: string = stacks
+    .map((stack) => stack.boxes[stack.boxes.length - 1])
+    .join("");
+
+  return answer;
+}
+
+// solve
 
 const data: string[] = fs
   .readFileSync("inputs/day_5.txt", "utf8")
   .split("\n\n");
 
-const initial_stacks_data: string[] = data[0].split("\n").reverse();
-const initial_stacks_indexes = initial_stacks_data[0]
-  .split("")
-  .map((val, idx) => (val !== " " ? idx : 0))
-  .filter((val) => val !== 0);
-
+const stacks_data: string[] = data[0].split("\n").reverse();
 const instructions: Instruction[] = data[1]
   .split("\n")
   .map((line) => line.split(" "))
   .map((line) => new Instruction(+line[1], +line[3], +line[5]));
 
-// part 1
-
-const stacks_p1: Stack[] = initial_stacks_indexes.map(
-  (idx) =>
-    new Stack(
-      idx,
-      initial_stacks_data
-        .slice(1)
-        .map((line) => line.charAt(idx))
-        .filter((val) => val !== " ")
-    )
-);
-
-instructions.forEach((instruction) =>
-  stacks_p1[instruction.from - 1].move(
-    instruction.amount,
-    stacks_p1[instruction.to - 1]
-  )
-);
-
-const answer_1: string = stacks_p1
-  .map((stack) => stack.boxes[stack.boxes.length - 1])
-  .join("");
-console.log(answer_1);
-
-// part 2
-
-const answer_2: number = 0;
-console.log(answer_2);
+console.log(`answer 1: ${answer(stacks_data, instructions, true)}`);
+console.log(`answer 2: ${answer(stacks_data, instructions, false)}`);
