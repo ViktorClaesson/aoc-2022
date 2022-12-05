@@ -1,5 +1,4 @@
-import * as fs from "fs";
-import { listenerCount } from "process";
+import fs from "fs";
 
 // read input
 

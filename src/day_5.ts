@@ -1,5 +1,4 @@
-import { reverse } from "dns";
-import * as fs from "fs";
+import fs from "fs";
 
 // data structures
 
