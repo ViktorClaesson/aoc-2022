@@ -1,0 +1,101 @@
+import fs from "fs";
+import { markAsUntransferable } from "worker_threads";
+
+// data structures
+
+class Folder {
+  name: string;
+  parent: Folder;
+  files: File[] = [];
+  folders: Folder[] = [];
+
+  constructor(name: string, parent: Folder | null = null) {
+    this.name = name;
+    if (parent !== null) {
+      this.parent = parent;
+    } else {
+      this.parent = this;
+    }
+  }
+
+  size(): number {
+    return (
+      this.files.reduce((acc, file) => acc + file.size, 0) +
+      this.folders.reduce((acc, folder) => acc + folder.size(), 0)
+    );
+  }
+
+  allFolders(): Folder[] {
+    return [this, ...this.folders.flatMap((folder) => folder.allFolders())];
+  }
+
+  addFile(name: string, size: number) {
+    this.files.push(new File(name, size));
+  }
+
+  addFolder(name: string) {
+    this.folders.push(new Folder(name, this));
+  }
+
+  cd(name: string): Folder {
+    const subFolder = this.folders.find((folder) => folder.name === name);
+    if (subFolder === undefined) {
+      throw `folder ${this.name} doesn't have a sub-folder ${name}`;
+    }
+    return subFolder;
+  }
+}
+
+class File {
+  name: string;
+  size: number;
+
+  constructor(name: string, size: number) {
+    this.name = name;
+    this.size = size;
+  }
+}
+
+// methods
+
+function initFileSystem(data: string[][]): Folder {
+  const rootFolder: Folder = new Folder("/");
+
+  let currentFolder: Folder = rootFolder;
+  for (const instruction of data) {
+    if (instruction[0] === "$" && instruction[1] === "cd") {
+      if (instruction[2] === "/") {
+        currentFolder = rootFolder;
+      } else if (instruction[2] === "..") {
+        currentFolder = currentFolder.parent;
+      } else {
+        currentFolder = currentFolder.cd(instruction[2]);
+      }
+    } else if (instruction[0] === "dir") {
+      currentFolder.addFolder(instruction[1]);
+    } else if (!isNaN(+instruction[0])) {
+      currentFolder.addFile(instruction[1], +instruction[0]);
+    }
+  }
+
+  return rootFolder;
+}
+
+function answer(rootFolder: Folder): number {
+  return rootFolder
+    .allFolders()
+    .filter((folder) => folder.size() <= 100000)
+    .reduce((acc, folder) => acc + folder.size(), 0);
+}
+
+// solve
+
+const data: string[][] = fs
+  .readFileSync("inputs/day_7.txt", "utf8")
+  .split("\n")
+  .map((line) => line.split(" "));
+
+const rootFolder = initFileSystem(data);
+
+console.log(`answer 1: ${answer(rootFolder)}`);
+console.log(`answer 2: ${0}`);
