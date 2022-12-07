@@ -1,5 +1,4 @@
 import fs from "fs";
-import { markAsUntransferable } from "worker_threads";
 
 // data structures
 
