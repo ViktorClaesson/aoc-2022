@@ -81,11 +81,19 @@ function initFileSystem(data: string[][]): Folder {
   return rootFolder;
 }
 
-function answer(rootFolder: Folder): number {
+function answer_1(rootFolder: Folder): number {
   return rootFolder
     .allFolders()
     .filter((folder) => folder.size() <= 100000)
     .reduce((acc, folder) => acc + folder.size(), 0);
+}
+
+function answer_2(rootFolder: Folder): number {
+  const spaceNeeded = 30000000 - (70000000 - rootFolder.size());
+  return rootFolder
+    .allFolders()
+    .filter((folder) => folder.size() >= spaceNeeded)
+    .reduce((acc, folder) => Math.min(acc, folder.size()), Infinity);
 }
 
 // solve
@@ -97,5 +105,5 @@ const data: string[][] = fs
 
 const rootFolder = initFileSystem(data);
 
-console.log(`answer 1: ${answer(rootFolder)}`);
-console.log(`answer 2: ${0}`);
+console.log(`answer 1: ${answer_1(rootFolder)}`);
+console.log(`answer 2: ${answer_2(rootFolder)}`);
