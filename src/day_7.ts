@@ -36,7 +36,7 @@ class Folder {
     this.folders.push(new Folder(name, this));
   }
 
-  cd(name: string): Folder {
+  findFolder(name: string): Folder {
     const subFolder = this.folders.find((folder) => folder.name === name);
     if (subFolder === undefined) {
       throw `folder ${this.name} doesn't have a sub-folder ${name}`;
@@ -68,7 +68,7 @@ function initFileSystem(data: string[][]): Folder {
       } else if (instruction[2] === "..") {
         currentFolder = currentFolder.parent;
       } else {
-        currentFolder = currentFolder.cd(instruction[2]);
+        currentFolder = currentFolder.findFolder(instruction[2]);
       }
     } else if (instruction[0] === "dir") {
       currentFolder.addFolder(instruction[1]);
