@@ -43,10 +43,6 @@ class Head {
       this.tail.update(this.x, this.y);
     }
   }
-
-  endTail(): Tail {
-    return this.tail.endTail();
-  }
 }
 
 class Tail {
@@ -84,8 +80,8 @@ class Tail {
     }
   }
 
-  endTail(): Tail {
-    return this.tail ? this.tail.endTail() : this;
+  end(): Tail {
+    return this.tail ? this.tail.end() : this;
   }
 }
 
@@ -108,7 +104,7 @@ function answer(instructions: string[][], knots: number): number {
   for (const [direction, amount] of instructions) {
     head.move(direction, +amount);
   }
-  return head.endTail().positionMemory.size;
+  return head.tail.end().positionMemory.size;
 }
 
 // solve
