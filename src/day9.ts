@@ -68,11 +68,9 @@ class Tail {
     if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
       this.x += Math.sign(dx);
       this.y += Math.sign(dy);
-      this.#memorizePosition();
 
-      if (this.tail) {
-        this.tail.update(this.x, this.y);
-      }
+      this.#memorizePosition();
+      this.tail?.update(this.x, this.y);
     }
   }
 
