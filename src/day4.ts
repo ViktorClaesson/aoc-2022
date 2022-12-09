@@ -25,7 +25,7 @@ class Range {
 }
 
 const data: Range[][] = fs
-  .readFileSync("inputs/day_4.txt", "utf8")
+  .readFileSync("inputs/day4.txt", "utf8")
   .split("\n")
   .map((line) => line.split(/[-,]/))
   .map(([range_1_min, range_1_max, range_2_min, range_2_max]) => [

@@ -98,7 +98,7 @@ function answer_2(rootFolder: Folder): number {
 // solve
 
 const data: string[][] = fs
-  .readFileSync("inputs/day_7.txt", "utf8")
+  .readFileSync("inputs/day7.txt", "utf8")
   .split("\n")
   .map((line) => line.split(" "));
 

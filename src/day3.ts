@@ -2,7 +2,7 @@ import fs from "fs";
 
 // read input
 
-const data: string[] = fs.readFileSync("inputs/day_3.txt", "utf8").split("\n");
+const data: string[] = fs.readFileSync("inputs/day3.txt", "utf8").split("\n");
 
 // part 1
 

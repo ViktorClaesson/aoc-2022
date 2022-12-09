@@ -85,9 +85,7 @@ function answer(
 
 // solve
 
-const data: string[] = fs
-  .readFileSync("inputs/day_5.txt", "utf8")
-  .split("\n\n");
+const data: string[] = fs.readFileSync("inputs/day5.txt", "utf8").split("\n\n");
 
 const stacks_data: string[] = data[0].split("\n").reverse();
 const instructions: Instruction[] = data[1]

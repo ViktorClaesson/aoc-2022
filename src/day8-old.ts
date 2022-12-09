@@ -8,7 +8,10 @@ function transpose(matrix: number[][]): number[][] {
   );
 }
 
-function answer_1(matrix: number[][]): number {
+function answerPartOne(matrix: number[][]): number {
+  // decided to use a different solution. I do think this would be better for large inputs though, since it pre calculates a matrix for the height needed to be seen.
+  // compared to iterating through the row and column for each cell in the matrix. Haven't done any analysis on it though, so not 100% sure.
+
   // from the trees perspective what's the highest tree looking towards west
   const maxWest: number[][] = matrix.map((treeRow) =>
     treeRow
@@ -75,16 +78,16 @@ function answer_1(matrix: number[][]): number {
     .reduce((acc, val) => acc + val, 0);
 }
 
-function answer_2(): number {
+function answerPartTwo(): number {
   return 42;
 }
 
 // solve
 
 const data: number[][] = fs
-  .readFileSync("inputs/day_8.txt", "utf8")
+  .readFileSync("inputs/day8.txt", "utf8")
   .split("\n")
   .map((line) => line.split("").map((tree) => +tree));
 
-console.log(`answer 1: ${answer_1(data)}`);
-console.log(`answer 2: ${answer_2()}`);
+console.log(`Answer part 1: ${answerPartOne(data)}`);
+console.log(`Answer part 2: ${answerPartTwo()}`);

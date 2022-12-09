@@ -13,6 +13,6 @@ function answer(data: string[], package_size: number): number {
 
 // solve
 
-const data: string[] = fs.readFileSync("inputs/day_6.txt", "utf8").split("");
+const data: string[] = fs.readFileSync("inputs/day6.txt", "utf8").split("");
 console.log(`answer 1: ${answer(data, 4)}`);
 console.log(`answer 2: ${answer(data, 14)}`);

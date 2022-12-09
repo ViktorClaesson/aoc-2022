@@ -3,7 +3,7 @@ import fs from "fs";
 // read input
 
 const data: number[][] = fs
-  .readFileSync("inputs/day_2.txt", "utf8")
+  .readFileSync("inputs/day2.txt", "utf8")
   .replace(/A/g, "1")
   .replace(/B/g, "2")
   .replace(/C/g, "3")
