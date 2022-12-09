@@ -43,6 +43,10 @@ class Head {
       this.tail.update(this.x, this.y);
     }
   }
+
+  endTail(): Tail {
+    return this.tail.endTail();
+  }
 }
 
 class Tail {
@@ -79,29 +83,32 @@ class Tail {
       this.positionMemory.add(`${this.x},${this.y}`);
     }
   }
+
+  endTail(): Tail {
+    return this.tail ? this.tail.endTail() : this;
+  }
 }
 
 // methods
 
-function answerPartOne(instructions: string[][]): number {
-  const head = new Head(new Tail(true));
-  for (const [direction, amount] of instructions) {
-    head.move(direction, +amount);
+function initRope(knots: number): Head {
+  if (knots < 2) {
+    throw `knots (${knots}) has to be at least 2`;
   }
-  return head.tail.positionMemory.size;
-}
 
-function answerPartTwo(instructions: string[][]): number {
-  const lastTail = new Tail(true);
-  let currentTail = lastTail;
-  for (let i = 0; i < 8; i++) {
+  let currentTail = new Tail(true);
+  for (let i = 0; i < knots - 2; i++) {
     currentTail = new Tail(false, currentTail);
   }
-  const head = new Head(currentTail);
+  return new Head(currentTail);
+}
+
+function answer(instructions: string[][], knots: number): number {
+  const head = initRope(knots);
   for (const [direction, amount] of instructions) {
     head.move(direction, +amount);
   }
-  return lastTail.positionMemory.size;
+  return head.endTail().positionMemory.size;
 }
 
 // solve
@@ -111,5 +118,5 @@ const data: string[][] = fs
   .split("\n")
   .map((line) => line.split(" "));
 
-console.log(`Answer part 1: ${answerPartOne(data)}`);
-console.log(`Answer part 2: ${answerPartTwo(data)}`);
+console.log(`Answer part 1: ${answer(data, 2)}`);
+console.log(`Answer part 2: ${answer(data, 10)}`);
