@@ -13,14 +13,31 @@ class Head {
     this.tail = tail;
   }
 
-  moveX(delta: number) {
+  move(direction: string, amount: number) {
+    switch (direction) {
+      case "R":
+        this.#moveX(amount);
+        break;
+      case "D":
+        this.#moveY(amount);
+        break;
+      case "L":
+        this.#moveX(-amount);
+        break;
+      case "U":
+        this.#moveY(-amount);
+        break;
+    }
+  }
+
+  #moveX(delta: number) {
     for (let i = 0; i < Math.abs(delta); i++) {
       this.x += Math.sign(delta);
       this.tail.update(this.x, this.y);
     }
   }
 
-  moveY(delta: number) {
+  #moveY(delta: number) {
     for (let i = 0; i < Math.abs(delta); i++) {
       this.y += Math.sign(delta);
       this.tail.update(this.x, this.y);
@@ -31,11 +48,15 @@ class Head {
 class Tail {
   x: number;
   y: number;
+  tail?: Tail;
+  memoriseTrip: boolean;
   positionMemory: Set<string>;
 
-  constructor() {
+  constructor(memoriseTrip: boolean, tail?: Tail) {
     this.x = 0;
     this.y = 0;
+    this.tail = tail;
+    this.memoriseTrip = memoriseTrip;
     this.positionMemory = new Set();
     this.#memorizePosition();
   }
@@ -48,39 +69,41 @@ class Tail {
       this.x += Math.sign(dx);
       this.y += Math.sign(dy);
       this.#memorizePosition();
+
+      if (this.tail) {
+        this.tail.update(this.x, this.y);
+      }
     }
   }
 
   #memorizePosition() {
-    this.positionMemory.add(`${this.x},${this.y}`);
+    if (this.memoriseTrip) {
+      this.positionMemory.add(`${this.x},${this.y}`);
+    }
   }
 }
 
 // methods
 
 function answerPartOne(instructions: string[][]): number {
-  const head = new Head(new Tail());
-  for (const [direction, value] of instructions) {
-    switch (direction) {
-      case "R":
-        head.moveX(+value);
-        break;
-      case "D":
-        head.moveY(+value);
-        break;
-      case "L":
-        head.moveX(-+value);
-        break;
-      case "U":
-        head.moveY(-+value);
-        break;
-    }
+  const head = new Head(new Tail(true));
+  for (const [direction, amount] of instructions) {
+    head.move(direction, +amount);
   }
   return head.tail.positionMemory.size;
 }
 
-function answerPartTwo(): number {
-  return 42;
+function answerPartTwo(instructions: string[][]): number {
+  const lastTail = new Tail(true);
+  let currentTail = lastTail;
+  for (let i = 0; i < 8; i++) {
+    currentTail = new Tail(false, currentTail);
+  }
+  const head = new Head(currentTail);
+  for (const [direction, amount] of instructions) {
+    head.move(direction, +amount);
+  }
+  return lastTail.positionMemory.size;
 }
 
 // solve
@@ -91,4 +114,4 @@ const data: string[][] = fs
   .map((line) => line.split(" "));
 
 console.log(`Answer part 1: ${answerPartOne(data)}`);
-console.log(`Answer part 2: ${answerPartTwo()}`);
+console.log(`Answer part 2: ${answerPartTwo(data)}`);
