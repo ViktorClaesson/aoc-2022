@@ -1,4 +1,5 @@
 import fs from "fs";
+import readline from "readline";
 
 // data structures
 
@@ -43,6 +44,14 @@ class Head {
       this.tail.update(this.x, this.y);
     }
   }
+
+  rest() {
+    return [this.tail, ...this.tail.rest()];
+  }
+
+  size() {
+    return 1 + this.rest().length;
+  }
 }
 
 class Tail {
@@ -83,6 +92,10 @@ class Tail {
   end(): Tail {
     return this.tail ? this.tail.end() : this;
   }
+
+  rest(): Tail[] {
+    return this.tail ? [this.tail, ...this.tail.rest()] : [];
+  }
 }
 
 // methods
@@ -116,3 +129,49 @@ const data: string[][] = fs
 
 console.log(`Answer part 1: ${answer(data, 2)}`);
 console.log(`Answer part 2: ${answer(data, 10)}`);
+
+// extra
+
+function printBoard(head: Head) {
+  const size: number = head.size() * 2 + 1;
+
+  const board: string[][] = Array(size)
+    .fill(0)
+    .map((_) => Array(size).fill("."));
+
+  const m = Math.floor(size / 2);
+  head
+    .rest()
+    .reverse()
+    .forEach(
+      (tail, index, tails) =>
+        (board[m + tail.y - head.y][m + tail.x - head.x] = `${
+          tails.length - index
+        }`)
+    );
+  board[m][m] = "H";
+
+  console.log(board.map((arr) => arr.join("")).join("\n"));
+}
+
+function askQuestion(head: Head, rl: readline.Interface) {
+  rl.question("[u]p, [d]own, [r]ight, or [l]eft?\n", (direction) => {
+    head.move(direction.toUpperCase(), 1);
+    printBoard(head);
+    askQuestion(head, rl);
+  });
+}
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+rl.question(
+  "How big of a rope do you want? Enter a number of at least 2.\n",
+  (size) => {
+    const head = initRope(+size);
+    printBoard(head);
+    askQuestion(head, rl);
+  }
+);
