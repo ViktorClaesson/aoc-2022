@@ -3,24 +3,14 @@ import fs from "fs";
 // methods
 
 function answerPartOne(instructions: string[]): number {
-  // padd the "addx" instructions with a "noop" before since they take 2 cycles.
-  instructions = instructions.flatMap((instruction) =>
-    instruction.startsWith("addx") ? ["noop", instruction] : [instruction]
-  );
-
-  let sum: number = 0;
-  let register: number = 1;
-  instructions.forEach((instruction, cycle) => {
-    if ((cycle + 1 - 20) % 40 === 0) {
-      sum += (cycle + 1) * register;
-    }
-
-    if (instruction.startsWith("addx")) {
-      const [_, amount] = instruction.split(" ");
-      register += +amount;
-    }
-  });
-  return sum;
+  return instructions
+    .flatMap((instruction) =>
+      instruction.startsWith("addx") ? [0, +instruction.split(" ")[1]] : [0]
+    )
+    .reduce((acc, val) => acc.concat(acc[acc.length - 1] + val), [1, 1])
+    .map((val, index) => val * index)
+    .filter((_, index) => (index - 20) % 40 === 0)
+    .reduce((acc, val) => acc + val, 0);
 }
 
 function answerPartTwo(): number {
