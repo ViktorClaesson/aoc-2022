@@ -1,5 +1,5 @@
 import fs from "fs";
-import { chunkify } from "./lib";
+import { chunksBySize } from "./lib";
 
 // read input
 
@@ -53,7 +53,7 @@ function findCommonLetter_2([bag_1, bag_2, bag_3]: string[]) {
   throw `couldn't find same letter: ${bag_1} and ${bag_2} and ${bag_3}`;
 }
 
-const answer_2: number = chunkify(data, 3)
+const answer_2: number = chunksBySize(data, 3)
   .map(findCommonLetter_2)
   .map(scoreLetter)
   .reduce((acc, val) => acc + val, 0);

@@ -1,6 +1,8 @@
 import fs from "fs";
 import readline from "readline";
 
+import { chunksBySize } from "./lib";
+
 // data structures
 
 class Head {
@@ -135,9 +137,7 @@ console.log(`Answer part 2: ${answer(data, 10)}`);
 function printBoard(head: Head) {
   const size: number = head.size() * 2 + 1;
 
-  const board: string[][] = Array(size)
-    .fill(0)
-    .map((_) => Array(size).fill("."));
+  const board: string[][] = chunksBySize(Array(size * size).fill("."), size);
 
   const m = Math.floor(size / 2);
   head
@@ -151,7 +151,7 @@ function printBoard(head: Head) {
     );
   board[m][m] = "H";
 
-  console.log(board.map((arr) => arr.join("")).join("\n"));
+  console.log(board.map((row) => row.join("")).join("\n"));
 }
 
 function askQuestion(head: Head, rl: readline.Interface) {

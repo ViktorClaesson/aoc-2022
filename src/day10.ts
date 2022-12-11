@@ -1,5 +1,5 @@
 import fs from "fs";
-import { chunkify } from "./lib";
+import { chunksBySize } from "./lib";
 
 // methods
 
@@ -28,8 +28,8 @@ function answerPartTwo(instructions: string[]): string {
   ); // give "#" if cycle is within 1 of register otherwise "."
 
   // convert to screen
-  return chunkify(output, 40)
-    .map((arr) => arr.join(" "))
+  return chunksBySize(output, 40)
+    .map((row) => row.join(" "))
     .join("\n");
 }
 
