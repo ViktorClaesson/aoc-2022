@@ -1,3 +1,5 @@
+import fs from "fs";
+
 // data structures
 
 class Monkey {
@@ -8,18 +10,17 @@ class Monkey {
   negativeTestMonkeyIndex: number;
   inspectCounter: number = 0;
 
-  constructor(
-    startingItems: number[],
-    operation: (item: number) => number,
-    testNumber: number,
-    positiveTestMonkeyIndex: number,
-    negativeTestMonkeyIndex: number
-  ) {
-    this.items = startingItems;
-    this.operation = operation;
-    this.testNumber = testNumber;
-    this.positiveTestMonkeyIndex = positiveTestMonkeyIndex;
-    this.negativeTestMonkeyIndex = negativeTestMonkeyIndex;
+  constructor(monkeyData: string[]) {
+    this.items = monkeyData[1]
+      .split(": ")[1]
+      .split(", ")
+      .map((item) => +item);
+    this.operation = initMonkeyOperation(
+      monkeyData[2].split(" = ")[1].split(" ")
+    );
+    this.testNumber = +monkeyData[3].trim().split(" ")[3];
+    this.positiveTestMonkeyIndex = +monkeyData[4].trim().split(" ")[5];
+    this.negativeTestMonkeyIndex = +monkeyData[5].trim().split(" ")[5];
   }
 
   doTurn(monkeys: Monkey[], worryFunction: (item: number) => number) {
@@ -40,17 +41,28 @@ class Monkey {
 
 // methods
 
-function initMonkeys(): Monkey[] {
-  return [
-    new Monkey([56, 52, 58, 96, 70, 75, 72], (item) => item * 17, 11, 2, 3),
-    new Monkey([75, 58, 86, 80, 55, 81], (item) => item + 7, 3, 6, 5),
-    new Monkey([73, 68, 73, 90], (item) => item ** 2, 5, 1, 7),
-    new Monkey([72, 89, 55, 51, 59], (item) => item + 1, 7, 2, 7),
-    new Monkey([76, 76, 91], (item) => item * 3, 19, 0, 3),
-    new Monkey([88], (item) => item + 4, 2, 6, 4),
-    new Monkey([64, 63, 56, 50, 77, 55, 55, 86], (item) => item + 8, 13, 4, 0),
-    new Monkey([79, 58], (item) => item + 6, 17, 1, 5),
-  ];
+function initMonkeys(data: string[][]): Monkey[] {
+  return data.map((monkeyData) => new Monkey(monkeyData));
+}
+
+function itemOrNumber(item: number, data: string): number {
+  return data === "old" ? item : +data;
+}
+
+function initMonkeyOperation(
+  operationData: string[]
+): (item: number) => number {
+  if (operationData[1] === "+") {
+    return (item: number) =>
+      itemOrNumber(item, operationData[0]) +
+      itemOrNumber(item, operationData[2]);
+  } else if (operationData[1] === "*") {
+    return (item: number) =>
+      itemOrNumber(item, operationData[0]) *
+      itemOrNumber(item, operationData[2]);
+  }
+
+  throw `${operationData[1]} is not one of + and *`;
 }
 
 function answer(
@@ -87,5 +99,10 @@ function answerPartTwo(monkeys: Monkey[]): number {
 
 // solve
 
-console.log(`Answer part 1: ${answerPartOne(initMonkeys())}`);
-console.log(`Answer part 2: ${answerPartTwo(initMonkeys())}`);
+const data: string[][] = fs
+  .readFileSync("inputs/day11.txt", "utf8")
+  .split("\n\n")
+  .map((monkeyData) => monkeyData.split("\n"));
+
+console.log(`Answer part 1: ${answerPartOne(initMonkeys(data))}`);
+console.log(`Answer part 2: ${answerPartTwo(initMonkeys(data))}`);
