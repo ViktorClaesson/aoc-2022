@@ -1,6 +1,6 @@
 import fs from "fs";
 
-// data structures
+// data structures && init functions
 
 class Monkey {
   items: number[];
@@ -39,8 +39,6 @@ class Monkey {
   }
 }
 
-// methods
-
 function initMonkeys(data: string[][]): Monkey[] {
   return data.map((monkeyData) => new Monkey(monkeyData));
 }
@@ -64,6 +62,8 @@ function initMonkeyOperation(
 
   throw `${operationData[1]} is not one of + and *`;
 }
+
+// solution methods
 
 function answer(
   monkeys: Monkey[],

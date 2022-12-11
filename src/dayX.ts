@@ -1,10 +1,14 @@
 import fs from "fs";
 
-// data structures
+// data structures && init functions
 
 class Foo {}
 
-// methods
+function initFoo(): Foo {
+  return new Foo();
+}
+
+// solution methods
 
 function answerPartOne(): number {
   return 42;
