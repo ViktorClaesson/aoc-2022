@@ -63,17 +63,17 @@ function checkPackets(packet1: Packet, packet2: Packet): boolean {
 
 function answerPartOne(packetPairs: [Packet, Packet][]): number {
   return packetPairs
-    .map((packets, index) => (checkPackets(...packets) ? index + 1 : 0))
-    .reduce((acc, val) => acc + val, 0);
+    .map((packets, index) => (checkPackets(...packets) ? index + 1 : 0)) // right order => index + 1, wrong order => 0
+    .reduce((acc, val) => acc + val, 0); // reduce by addition
 }
 
 function answerPartTwo(packets: Packet[]): number {
   return [[[2]], [[6]], ...packets]
-    .sort((packet1, packet2) => -2 * +checkPackets(packet1, packet2) + 1)
+    .sort((packet1, packet2) => -2 * +checkPackets(packet1, packet2) + 1) // wrong order (true) => -1, right order (false) => 1
     .map((packet, index) =>
-      equals(packet, [[2]]) ? index + 1 : equals(packet, [[6]]) ? index + 1 : 1
-    )
-    .reduce((acc, val) => acc * val, 1);
+      equals(packet, [[2]]) || equals(packet, [[6]]) ? index + 1 : 1
+    ) // divider packet => index + 1, otherwise => 1
+    .reduce((acc, val) => acc * val, 1); // reduce by multiplication
 }
 
 // solve
