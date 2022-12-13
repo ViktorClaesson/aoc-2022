@@ -1,5 +1,5 @@
 import fs from "fs";
-import { chunksBySize } from "./lib";
+import { chunksBySize } from "./utils/common";
 
 // read input
 

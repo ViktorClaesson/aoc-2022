@@ -1,5 +1,5 @@
 import fs from "fs";
-import { rollingChunks } from "./lib";
+import { rollingChunks } from "./utils/common";
 
 // methods
 

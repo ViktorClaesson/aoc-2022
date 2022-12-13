@@ -1,7 +1,7 @@
 import fs from "fs";
 import readline from "readline";
 
-import { chunksBySize } from "./lib";
+import { chunksBySize } from "./utils/common";
 
 // data structures
 
