@@ -1,3 +1,4 @@
+import { notDeepEqual } from "assert";
 import fs from "fs";
 import { rollingChunks, range } from "./utils/common";
 
@@ -6,23 +7,31 @@ import { rollingChunks, range } from "./utils/common";
 class CaveMatrix {
   #minCol: number;
   #matrix: string[][];
+  #infiniteFloor: boolean;
 
-  constructor(data: [number, number][][]) {
+  constructor(data: [number, number][][], infiniteFloor: boolean) {
+    this.#infiniteFloor = infiniteFloor;
     this.#minCol = Math.min(
       ...data.flatMap((line) => line).map(([col, _]) => col),
       500
     );
-    const maxCol: number = Math.max(
-      ...data.flatMap((line) => line).map(([col, _]) => col),
-      500
-    );
-    const maxRow: number = Math.max(
-      ...data.flatMap((line) => line).map(([_, row]) => row)
-    );
 
-    this.#matrix = Array(maxRow + 1)
+    const cols: number =
+      Math.max(...data.flatMap((line) => line).map(([col, _]) => col), 500) -
+      this.#minCol +
+      1;
+    const rows: number =
+      Math.max(...data.flatMap((line) => line).map(([_, row]) => row), 0) + 1;
+
+    this.#matrix = Array(rows)
       .fill(0)
-      .map((_) => Array(maxCol - this.#minCol + 1).fill("."));
+      .map((_) => Array(cols).fill("."));
+    if (this.#infiniteFloor) {
+      this.#matrix = this.#matrix.concat([
+        Array(cols).fill("."),
+        Array(cols).fill("#"),
+      ]);
+    }
 
     data.forEach((line) =>
       rollingChunks(line, 2).map(([[col1, row1], [col2, row2]]) =>
@@ -36,22 +45,49 @@ class CaveMatrix {
   }
 
   #checkFree(row: number, col: number): boolean {
-    if (
-      row < 0 ||
+    return (
       row >= this.#matrix.length ||
       col < 0 ||
-      col >= this.#matrix[row].length
-    ) {
-      return true;
-    }
-    return this.#matrix[row][col] === ".";
+      col >= this.#matrix[row].length ||
+      this.#matrix[row][col] === "."
+    );
+  }
+
+  #expandWest() {
+    this.#minCol--;
+    this.#matrix = this.#matrix.map((row, index, rows) => [
+      index === rows.length - 1 ? "#" : ".",
+      ...row,
+    ]);
+  }
+
+  #expandEast() {
+    this.#matrix = this.#matrix.map((row, index, rows) => [
+      ...row,
+      index === rows.length - 1 ? "#" : ".",
+    ]);
   }
 
   giveSand(): boolean {
     let row = 0;
     let col = 500 - this.#minCol;
 
+    if (!this.#checkFree(row, col)) {
+      return false;
+    }
+
     while (true) {
+      if (this.#infiniteFloor) {
+        // if we are using the infiniteFloor option we should expand west/east respectively if we're ever at the border.
+        // so that we expand the floor and can check if it's free.
+        if (col === 0) {
+          this.#expandWest();
+          col++;
+        } else if (col === this.#matrix[row].length - 1) {
+          this.#expandEast();
+        }
+      }
+
       if (this.#checkFree(row + 1, col)) {
         // go down
         row += 1;
@@ -69,6 +105,7 @@ class CaveMatrix {
         return true;
       }
 
+      // only really happens if the infiniteFloor option is false.
       if (
         row >= this.#matrix.length ||
         col < 0 ||
@@ -85,22 +122,20 @@ class CaveMatrix {
       .flatMap((row) => row.map((cell) => +(cell === "o")))
       .reduce((acc, val) => acc + val, 0);
   }
-
-  print() {
-    console.log(this.#matrix.map((row) => row.join("")).join("\n"));
-  }
 }
 
 // solution methods
 
 function answerPartOne(data: [number, number][][]): number {
-  const cave = new CaveMatrix(data);
+  const cave = new CaveMatrix(data, false);
   while (cave.giveSand()) {}
   return cave.countSand();
 }
 
-function answerPartTwo(): number {
-  return 42;
+function answerPartTwo(data: [number, number][][]): number {
+  const cave = new CaveMatrix(data, true);
+  while (cave.giveSand()) {}
+  return cave.countSand();
 }
 
 // solve
@@ -116,4 +151,4 @@ const data: [number, number][][] = fs
   );
 
 console.log(`Answer part 1: ${answerPartOne(data)}`);
-console.log(`Answer part 2: ${answerPartTwo()}`);
+console.log(`Answer part 2: ${answerPartTwo(data)}`);
