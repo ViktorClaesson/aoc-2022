@@ -35,3 +35,8 @@ export function equals(a: any, b: any): boolean {
     return a === b;
   }
 }
+
+export function range(a: number, b: number): number[] {
+  const dir = Math.sign(b - a);
+  return [...Array(Math.abs(b - a) + 1).keys()].map((index) => a + index * dir);
+}
