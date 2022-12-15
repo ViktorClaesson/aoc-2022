@@ -1,5 +1,5 @@
 export function toString(item: any): string {
-  if (item.constructor === Array) {
+  if (item && item.constructor === Array) {
     return `[${item.map((subItem) => toString(subItem)).join(", ")}]`;
   }
   return `${item}`;
