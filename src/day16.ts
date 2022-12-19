@@ -1,31 +1,18 @@
-import { time } from "console";
 import fs from "fs";
-import { id1, idN } from "./utils/debug";
 
 // data structures && init functions
 
-class State {
-  currentCave: Cave;
-  timeLeft: number;
-  openValves: Set<Cave> = new Set();
-
-  constructor(
-    currentCave: Cave,
-    timeLeft: number,
-    openValves: Set<Cave> = new Set()
-  ) {
-    this.currentCave = currentCave;
-    this.timeLeft = timeLeft;
-    this.openValves = openValves;
-  }
-
-  toString(): string {
-    const openValves = [...this.openValves.values()]
-      .map((cave) => cave.name)
-      .sort()
-      .join(",");
-    return `${this.currentCave.name},${this.timeLeft},${openValves}`;
-  }
+function stateString(
+  currentCave: Cave,
+  timeLeft: number,
+  playersLeft: number,
+  openValves: Set<Cave> = new Set()
+): string {
+  const valves = [...openValves.values()]
+    .map((cave) => cave.name)
+    .sort()
+    .join(",");
+  return `${currentCave.name},${timeLeft},${playersLeft},${valves}`;
 }
 
 class Cave {
@@ -66,51 +53,104 @@ function initCaves(data: string[][]): Cave[] {
 
 // solution methods
 
-function answerPartOne(
+function getPossibleRoutes(currentCave: Cave, openValves: Set<Cave>): Cave[] {
+  return (
+    currentCave.flow > 0 && !openValves.has(currentCave) ? [currentCave] : []
+  ).concat(currentCave.network);
+}
+
+function calcPressureReleased(
+  newCurrentCave: Cave,
+  oldCurrentCave: Cave,
+  timeLeft: number,
+  openValves: Set<Cave>
+): [number, Set<Cave>] {
+  if (
+    oldCurrentCave == newCurrentCave &&
+    !openValves.has(oldCurrentCave) &&
+    oldCurrentCave.flow > 0
+  ) {
+    return [
+      oldCurrentCave.flow * (timeLeft - 1),
+      new Set([oldCurrentCave, ...openValves]),
+    ];
+  } else {
+    return [0, openValves];
+  }
+}
+
+function answerRec(
   caves: Cave[],
   currentCave: Cave,
   timeLeft: number,
-  openValves: Set<Cave> = new Set(),
-  memory: Map<string, number> = new Map()
+  playersLeft: number,
+  resetCurrentCave: Cave,
+  resetTime: number,
+  openValves: Set<Cave>,
+  memory: Map<string, number>
 ): number {
-  if (timeLeft === 0) {
-    return 0;
+  if (timeLeft <= 1) {
+    return playersLeft > 0
+      ? answerRec(
+          caves,
+          resetCurrentCave,
+          resetTime,
+          playersLeft - 1,
+          resetCurrentCave,
+          resetTime,
+          openValves,
+          memory
+        )
+      : 0;
   }
 
-  const memoryKey = new State(currentCave, timeLeft, openValves).toString();
+  const memoryKey = stateString(currentCave, timeLeft, playersLeft, openValves);
   const memoryValue = memory.get(memoryKey);
   if (memoryValue !== undefined) {
     return memoryValue;
   }
 
-  let returnValue: number = 0;
-  if (openValves.has(currentCave) || currentCave.flow === 0) {
-    returnValue = Math.max(
-      ...currentCave.network.map((cave) =>
-        answerPartOne(caves, cave, timeLeft - 1, openValves, memory)
-      )
-    );
-  } else {
-    returnValue = Math.max(
-      currentCave.flow * (timeLeft - 1) +
-        answerPartOne(
+  const possibleRoutes = getPossibleRoutes(currentCave, openValves);
+  const returnValue: number = Math.max(
+    ...possibleRoutes.map((newCurrentCave) => {
+      const [pressureReleased, newOpenValves] = calcPressureReleased(
+        currentCave,
+        newCurrentCave,
+        timeLeft,
+        openValves
+      );
+      return (
+        pressureReleased +
+        answerRec(
           caves,
-          currentCave,
+          newCurrentCave,
           timeLeft - 1,
-          new Set([currentCave, ...openValves]),
+          playersLeft,
+          resetCurrentCave,
+          resetTime,
+          newOpenValves,
           memory
-        ),
-      ...currentCave.network.map((cave) =>
-        answerPartOne(caves, cave, timeLeft - 1, openValves, memory)
-      )
-    );
-  }
+        )
+      );
+    })
+  );
+
   memory.set(memoryKey, returnValue);
   return returnValue;
 }
 
-function answerPartTwo(): number {
-  return 42;
+function answer(caves: Cave[], players: number, time: number) {
+  const startCave = caves.find((cave) => cave.name === "AA") as Cave;
+  return answerRec(
+    caves,
+    startCave,
+    time,
+    players - 1,
+    startCave,
+    time,
+    new Set(),
+    new Map()
+  );
 }
 
 // solve
@@ -125,9 +165,7 @@ const data = fs
       ) || []
     ).slice(1)
   );
-
 const caves = initCaves(data);
-const startingCave = caves.find((cave) => cave.name === "AA") as Cave;
 
-console.log(`Answer part 1: ${answerPartOne(caves, startingCave, 30)}`);
-console.log(`Answer part 2: ${answerPartTwo()}`);
+console.log(`Answer part 1: ${answer(caves, 1, 30)}`);
+console.log(`Answer part 2: ${answer(caves, 2, 26)}`);
