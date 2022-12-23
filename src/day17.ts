@@ -29,14 +29,24 @@ function debug(
   console.log("");
 }
 
-function answerPartOne(rocks: string[][][], jetStream: string[]): number {
+function answer(
+  rocks: string[][][],
+  jetStream: string[],
+  rocksToDrop: number
+): number {
+  let extraHeight = 0;
   let jetStreamIndex = 0;
   let map: string[] = [];
-  for (let i = 0; i < 2022; i++) {
+  for (let i = 0; i < rocksToDrop; i++) {
+    if (i % 1000 === 0) {
+      console.log((100 * i) / rocksToDrop, "%");
+    }
+
     let x = 2;
     let y = 0;
     const rock: string[][] = rocks[i % rocks.length];
 
+    // padd / slice map array so that the rock is 3 steps from the highest rock / floor
     const firstNonEmpty = Math.max(
       map.findIndex((line) => line !== "......."),
       0
@@ -46,6 +56,13 @@ function answerPartOne(rocks: string[][][], jetStream: string[]): number {
       map = [...Array(Math.max(0, linesToPadd)).fill("......."), ...map];
     } else if (linesToPadd < 0) {
       map = map.slice(-linesToPadd);
+    }
+
+    // remove any layer below a full layer and add that height to extraHeight
+    const fullLine = map.findIndex((line) => line === "#######");
+    if (fullLine !== -1) {
+      extraHeight += map.length - fullLine;
+      map = map.slice(0, fullLine);
     }
 
     // debug("NEW ROCK;", map, rock, x, y);
@@ -107,11 +124,7 @@ function answerPartOne(rocks: string[][][], jetStream: string[]): number {
     }
   }
 
-  return map.filter((line) => line !== ".......").length;
-}
-
-function answerPartTwo(): number {
-  return 42;
+  return extraHeight + map.filter((line) => line !== ".......").length;
 }
 
 // solve
@@ -137,5 +150,5 @@ const rocks: string[][][] = [
   ],
 ];
 
-console.log(`Answer part 1: ${answerPartOne(rocks, data)}`);
-console.log(`Answer part 2: ${answerPartTwo()}`);
+console.log(`Answer part 1: ${answer(rocks, data, 2022)}`);
+console.log(`Answer part 2: ${answer(rocks, data, 1000000000000)}`);
