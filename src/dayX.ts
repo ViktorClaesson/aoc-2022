@@ -20,6 +20,9 @@ function answerPartTwo(): number {
 
 // solve
 
-const data: string = fs.readFileSync("inputs/dayX.txt", "utf8");
-console.log(`Answer part 1: ${answerPartOne()}`);
-console.log(`Answer part 2: ${answerPartTwo()}`);
+const _ = (() => {
+  const data: string = fs.readFileSync("inputs/day18.txt", "utf8");
+
+  console.log(`Answer part 1: ${answerPartOne()}`);
+  console.log(`Answer part 2: ${answerPartTwo()}`);
+})();
