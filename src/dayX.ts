@@ -21,7 +21,7 @@ function answerPartTwo(): number {
 // solve
 
 const _ = (() => {
-  const data: string = fs.readFileSync("inputs/day18.txt", "utf8");
+  const data: string = fs.readFileSync("inputs/dayX.txt", "utf8");
 
   console.log(`Answer part 1: ${answerPartOne()}`);
   console.log(`Answer part 2: ${answerPartTwo()}`);
