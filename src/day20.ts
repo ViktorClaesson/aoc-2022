@@ -2,12 +2,13 @@ import fs from "fs";
 
 // solution methods
 
-function mix(data: number[]): number[] {
+function mix(data: number[], times: number): number[] {
   let tempArray: [number, number][] = data.slice().map((v, i) => [v, i]);
-  // console.log(tempArray.map(([v, _]) => v).toString());
 
-  for (let ci = 0; ci < data.length; ci++) {
-    let ti = tempArray.findIndex(([_, oi]) => oi === ci) as number;
+  for (let ci = 0; ci < data.length * times; ci++) {
+    let ti = tempArray.findIndex(
+      ([_, oi]) => oi === ci % tempArray.length
+    ) as number;
     let v = tempArray[ti][0] % (tempArray.length - 1);
 
     while (v > 0) {
@@ -24,14 +25,12 @@ function mix(data: number[]): number[] {
       ti = (ti - 1 + tempArray.length) % tempArray.length;
       v += 1;
     }
-
-    // console.log(tempArray.map(([v, _]) => v).toString());
   }
   return tempArray.map(([v, _]) => v);
 }
 
 function answerPartOne(data: number[]): number {
-  const mixed = mix(data);
+  const mixed = mix(data, 1);
   const zeroIndex = mixed.findIndex((v) => v === 0);
 
   return (
@@ -41,8 +40,18 @@ function answerPartOne(data: number[]): number {
   );
 }
 
-function answerPartTwo(): number {
-  return 42;
+function answerPartTwo(data: number[]): number {
+  const mixed = mix(
+    data.map((v) => v * 811589153),
+    10
+  );
+  const zeroIndex = mixed.findIndex((v) => v === 0);
+
+  return (
+    mixed[(zeroIndex + 1000) % mixed.length] +
+    mixed[(zeroIndex + 2000) % mixed.length] +
+    mixed[(zeroIndex + 3000) % mixed.length]
+  );
 }
 
 // solve
@@ -54,5 +63,5 @@ const _ = (() => {
     .map((s) => +s);
 
   console.log(`Answer part 1: ${answerPartOne(data)}`);
-  console.log(`Answer part 2: ${answerPartTwo()}`);
+  console.log(`Answer part 2: ${answerPartTwo(data)}`);
 })();
