@@ -29,21 +29,14 @@ function mix(data: number[], times: number): number[] {
   return tempArray.map(([v, _]) => v);
 }
 
-function answerPartOne(data: number[]): number {
-  const mixed = mix(data, 1);
-  const zeroIndex = mixed.findIndex((v) => v === 0);
-
-  return (
-    mixed[(zeroIndex + 1000) % mixed.length] +
-    mixed[(zeroIndex + 2000) % mixed.length] +
-    mixed[(zeroIndex + 3000) % mixed.length]
-  );
-}
-
-function answerPartTwo(data: number[]): number {
+function answer(
+  data: number[],
+  timesToMix: number,
+  decryptionKey: number
+): number {
   const mixed = mix(
-    data.map((v) => v * 811589153),
-    10
+    data.map((v) => v * decryptionKey),
+    timesToMix
   );
   const zeroIndex = mixed.findIndex((v) => v === 0);
 
@@ -62,6 +55,6 @@ const _ = (() => {
     .split("\n")
     .map((s) => +s);
 
-  console.log(`Answer part 1: ${answerPartOne(data)}`);
-  console.log(`Answer part 2: ${answerPartTwo(data)}`);
+  console.log(`Answer part 1: ${answer(data, 1, 1)}`);
+  console.log(`Answer part 2: ${answer(data, 10, 811589153)}`);
 })();
