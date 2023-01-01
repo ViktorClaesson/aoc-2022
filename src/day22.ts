@@ -2,6 +2,25 @@ import fs from "fs";
 
 // solution methods
 
+function debug(matrix: string[][], row: number, col: number, dir: number) {
+  const dirString = new Map([
+    [0, ">"],
+    [1, "v"],
+    [2, "<"],
+    [3, "^"],
+  ]);
+  console.log(
+    matrix
+      .map((r, ri) =>
+        r
+          .map((c, ci) => (ri === row && ci === col ? dirString.get(dir) : c))
+          .join("")
+      )
+      .join("\n")
+  );
+  console.log("");
+}
+
 function minMax(line: string[]): [number, number] {
   const min = line.findIndex((v) => v !== " ");
   const max =
